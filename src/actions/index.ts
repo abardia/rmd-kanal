@@ -3,7 +3,7 @@
 import { getPrices, updatePrices as dbUpdatePrices, getOffers, getOffer, saveOffer, getDefaultPrices } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from "openai"
 
 function safeFloat(value: string | undefined, defaultVal = 0): number {
   try {
@@ -174,8 +174,12 @@ export async function generateOffer(formData: FormData) {
 export async function extractWithLLM(text: string) {
   const apiKey = process.env.GEMINI_API_KEY;
   
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+  const openai = new OpenAI({
+    apiKey: apiKey,
+    baseURL: "https://api.us-west-2.modal.direct" // Der Modal-Endpunkt
+  });
+  
+  
 
   const prompt = `Extrahiere aus dem folgenden Text alle relevanten Informationen für ein Tiefbau-Angebot und gib das Ergebnis als JSON zurück.
 
@@ -200,8 +204,16 @@ Benötigte Felder:
 - workers: Anzahl Arbeitertage falls genannt
 
 Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null.`;
-
-  const result = await model.generateContent(prompt + '\n\nText:\n' + text);
+	
+  const response = await openai.chat.completions.create({
+      model: "zai-org/GLM-5-FP8", 
+      messages: [{ 
+        role: "user", content: prompt 
+        }
+      ],
+      max_tokens: 2048
+    });
+    
   const response = result.response.text();
   
   let cleaned = response.trim();
