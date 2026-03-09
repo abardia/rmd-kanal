@@ -32,156 +32,154 @@
   }
 }
 
-@layer components {
-  @utility glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+@utility glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+@utility apple-button {
+  @apply transition-all duration-200 ease-in-out font-semibold px-6 py-3 rounded-full text-center;
+  background: var(--apple-blue);
+  color: white;
+
+  &:hover {
+    @apply opacity-90 scale-[1.02];
+    box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
   }
 
-  @utility glass-dark {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  &:active {
+    @apply scale-[0.98];
   }
+}
 
-  @utility apple-button {
-    @apply transition-all duration-200 ease-in-out font-semibold px-6 py-3 rounded-full text-center;
-    background: var(--apple-blue);
-    color: white;
+@utility input-field {
+  @apply w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(0, 0, 0, 0.1);
 
-    &:hover {
-      @apply opacity-90 scale-[1.02];
-      box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
-    }
-
-    &:active {
-      @apply scale-[0.98];
-    }
-  }
-
-  @utility input-field {
-    @apply w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none;
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(0, 0, 0, 0.1);
-
-    &:focus {
-      @apply border-blue-500 ring-2 ring-blue-500/20;
-      background: rgba(255, 255, 255, 0.8);
-    }
-  }
-
-  @utility nav-blur {
-    @apply sticky top-0 z-50 w-full;
+  &:focus {
+    @apply border-blue-500 ring-2 ring-blue-500/20;
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
+}
 
-  /* Re-implementing old classes for compatibility but with new style */
-  .header {
-    @apply nav-blur py-4 px-6 flex justify-between items-center;
-  }
+@utility nav-blur {
+  @apply sticky top-0 z-50 w-full;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
 
-  .header h1 {
-    @apply text-xl font-bold tracking-tight;
-  }
+/* Re-implementing old classes for compatibility but with new style */
+.header {
+  @apply nav-blur py-4 px-6 flex justify-between items-center;
+}
 
-  .header .nav-link {
-    @apply text-sm font-medium px-4 py-2 rounded-full transition-colors;
-    color: var(--foreground);
-  }
+.header h1 {
+  @apply text-xl font-bold tracking-tight;
+}
 
-  .header .nav-link:hover {
-    @apply bg-black/5;
-  }
+.header .nav-link {
+  @apply text-sm font-medium px-4 py-2 rounded-full transition-colors;
+  color: var(--foreground);
+}
 
-  .container {
-    @apply max-w-[1000px] mx-auto px-4 py-8;
-  }
+.header .nav-link:hover {
+  @apply bg-black/5;
+}
 
-  .form-section {
-    @apply glass rounded-3xl p-8 mb-6 transition-all;
-  }
+.container {
+  @apply max-w-[1000px] mx-auto px-4 py-8;
+}
 
-  .section-title {
-    @apply text-lg font-bold mb-6 flex items-center gap-2;
-    color: var(--apple-blue);
-  }
+.form-section {
+  @apply glass rounded-3xl p-8 mb-6 transition-all;
+}
 
-  .form-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-  }
+.section-title {
+  @apply text-lg font-bold mb-6 flex items-center gap-2;
+  color: var(--apple-blue);
+}
 
-  .full-width {
-    @apply md:col-span-2;
-  }
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
 
-  .form-group {
-    @apply flex flex-col gap-2;
-  }
+.full-width {
+  @apply md:col-span-2;
+}
 
-  .form-group label {
-    @apply text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1;
-  }
+.form-group {
+  @apply flex flex-col gap-2;
+}
 
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    @apply input-field;
-  }
+.form-group label {
+  @apply text-xs font-semibold uppercase tracking-wider text-gray-500 ml-1;
+}
 
-  .work-item {
-    @apply bg-white/40 border border-white/50 rounded-2xl p-6 mb-4 transition-all hover:bg-white/60;
-  }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  @apply input-field;
+}
 
-  .work-item-header {
-    @apply text-sm font-bold uppercase tracking-widest text-gray-400 mb-4;
-  }
+.work-item {
+  @apply bg-white/40 border border-white/50 rounded-2xl p-6 mb-4 transition-all hover:bg-white/60;
+}
 
-  .total-preview {
-    @apply glass-dark text-white rounded-3xl p-8 mb-8 text-center;
-  }
+.work-item-header {
+  @apply text-sm font-bold uppercase tracking-widest text-gray-400 mb-4;
+}
 
-  .total-preview .label {
-    @apply text-sm font-medium opacity-70 mb-2;
-  }
+.total-preview {
+  @apply glass-dark text-white rounded-3xl p-8 mb-8 text-center;
+}
 
-  .total-preview .amount {
-    @apply text-4xl font-black tracking-tight;
-  }
+.total-preview .label {
+  @apply text-sm font-medium opacity-70 mb-2;
+}
 
-  .btn-primary {
-    @apply apple-button w-full text-lg;
-  }
+.total-preview .amount {
+  @apply text-4xl font-black tracking-tight;
+}
 
-  .prefill-badge {
-    @apply text-[10px] font-bold px-2 py-0.5 rounded-full ml-2 align-middle;
-    background: rgba(0, 113, 227, 0.1);
-    color: var(--apple-blue);
-    border: 1px solid rgba(0, 113, 227, 0.2);
-  }
+.btn-primary {
+  @apply apple-button w-full text-lg;
+}
 
-  .offers-list { @apply flex flex-col gap-4; }
-  .offer-card {
-    @apply glass rounded-2xl p-6 flex justify-between items-center transition-all hover:scale-[1.01] hover:shadow-lg;
-  }
-  .offer-info h3 { @apply font-bold text-lg mb-1; }
-  .offer-info p { @apply text-sm text-gray-500; }
-  .offer-amount { @apply text-xl font-bold text-blue-600; }
-  .btn-view { @apply apple-button text-sm py-2 px-4 rounded-xl; }
+.prefill-badge {
+  @apply text-[10px] font-bold px-2 py-0.5 rounded-full ml-2 align-middle;
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--apple-blue);
+  border: 1px solid rgba(0, 113, 227, 0.2);
+}
 
-  .price-row {
-    @apply flex justify-between items-center py-4 border-b border-black/5;
-  }
-  .price-row:last-child { border-bottom: none; }
+.offers-list { @apply flex flex-col gap-4; }
+.offer-card {
+  @apply glass rounded-2xl p-6 flex justify-between items-center transition-all hover:scale-[1.01] hover:shadow-lg;
+}
+.offer-info h3 { @apply font-bold text-lg mb-1; }
+.offer-info p { @apply text-sm text-gray-500; }
+.offer-amount { @apply text-xl font-bold text-blue-600; }
+.btn-view { @apply apple-button text-sm py-2 px-4 rounded-xl; }
 
-  .flash {
-    @apply glass bg-green-50/50 border-green-200/50 text-green-800 p-4 rounded-2xl mb-6 text-center font-medium;
-  }
+.price-row {
+  @apply flex justify-between items-center py-4 border-b border-black/5;
+}
+.price-row:last-child { border-bottom: none; }
+
+.flash {
+  @apply glass bg-green-50/50 border-green-200/50 text-green-800 p-4 rounded-2xl mb-6 text-center font-medium;
 }
