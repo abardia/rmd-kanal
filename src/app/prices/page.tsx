@@ -1,6 +1,8 @@
-import { getPrices, updatePrices } from '@/actions';
+import { updatePrices } from '@/actions';
+import { getPrices } from '@/lib/db';
 import { PriceListItem } from '@/types';
 import Link from 'next/link';
+import ThemeToggle from '../ThemeToggle';
 
 export default async function PricesPage() {
   const pricesRaw = await getPrices();
@@ -18,8 +20,9 @@ export default async function PricesPage() {
             <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Konfiguration der Standardpreise</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/" className="nav-link">Abbrechen</Link>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -58,15 +61,13 @@ export default async function PricesPage() {
             </div>
           </div>
 
-          <div className="fixed bottom-8 left-0 right-0 z-50 px-4">
-             <div className="max-w-2xl mx-auto">
-               <button type="submit" className="btn-primary shadow-2xl">
-                 <span className="flex items-center justify-center gap-2">
-                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-                   Preiskonfiguration speichern
-                 </span>
-               </button>
-             </div>
+          <div className="mt-12">
+             <button type="submit" className="btn-primary">
+               <span className="flex items-center justify-center gap-2">
+                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                 Preiskonfiguration speichern
+               </span>
+             </button>
           </div>
         </form>
       </div>

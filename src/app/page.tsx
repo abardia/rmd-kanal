@@ -1,11 +1,16 @@
 
-import { getPricesData } from '@/actions';
+import { getPrices, getDefaultPrices } from '@/lib/db';
 import OfferForm from './OfferForm';
 import Link from 'next/link';
+import ThemeToggle from './ThemeToggle';
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ prefill?: string }> }) {
   const params = await searchParams;
-  const prices = await getPricesData();
+  let pricesRaw = await getPrices();
+  if (!pricesRaw || (pricesRaw as any[]).length === 0) {
+    pricesRaw = getDefaultPrices().map(p => ({ ...p, id: 0, name: p.item_key, unit: 'm' }));
+  }
+  const prices = pricesRaw as any[];
   
   const defaultPrices: Record<string, number> = {};
   for (const p of prices as { item_key: string; default_price: number }[]) {
@@ -33,10 +38,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
             <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">RMD Kanaltechnik</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/offers" className="nav-link">Angebote</Link>
           <Link href="/prices" className="nav-link">Preise</Link>
-          <Link href="/llm" className="nav-link bg-black text-white! px-5">KI-Modus</Link>
+          <Link href="/llm" className="nav-link bg-black text-white! dark:bg-white dark:text-black! px-5">KI-Modus</Link>
+          <ThemeToggle />
         </div>
       </nav>
 

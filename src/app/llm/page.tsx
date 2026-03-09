@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { extractWithLLM } from '@/actions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ThemeToggle from '../ThemeToggle';
 
 export default function LLMPage() {
   const [text, setText] = useState('');
@@ -44,8 +45,9 @@ export default function LLMPage() {
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Intelligente Angebotserstellung</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/" className="nav-link text-white! hover:bg-white/10">Abbrechen</Link>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -86,7 +88,7 @@ export default function LLMPage() {
             <div className="mt-8 flex flex-col gap-4">
                <button 
                 type="submit" 
-                className={`apple-button w-full text-lg py-4 flex items-center justify-center gap-3 shadow-blue-500/20 shadow-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`apple-button w-full text-lg py-4 flex items-center justify-center gap-3 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={loading}
               >
                 {loading ? (

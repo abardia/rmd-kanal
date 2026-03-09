@@ -18,16 +18,16 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
   function calculateTotal() {
     let subtotal = 0;
 
-    const items = [
-      ['cable_length', 'cable_unit_price'],
-      ['excavation_volume', 'excavation_unit_price'],
-      ['trench_length', 'trench_unit_price'],
-      ['pipe_length', 'pipe_unit_price'],
-      ['backfill_volume', 'backfill_unit_price'],
-      ['asphalt_area', 'asphalt_unit_price']
+    const itemKeys = [
+      { qty: 'cable_length', price: 'cable_length_unit_price' },
+      { qty: 'excavation_volume', price: 'excavation_volume_unit_price' },
+      { qty: 'trench_length', price: 'trench_length_unit_price' },
+      { qty: 'pipe_length', price: 'pipe_length_unit_price' },
+      { qty: 'backfill_volume', price: 'backfill_volume_unit_price' },
+      { qty: 'asphalt_area', price: 'asphalt_area_unit_price' }
     ];
 
-    items.forEach(([qty, price]) => {
+    itemKeys.forEach(({ qty, price }) => {
       const q = parseFloat((document.querySelector(`[name="${qty}"]`) as HTMLInputElement)?.value) || 0;
       const p = parseFloat((document.querySelector(`[name="${price}"]`) as HTMLInputElement)?.value) || 0;
       subtotal += q * p;
@@ -54,9 +54,9 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
     if (prefill[key] !== undefined && prefill[key] !== null && prefill[key] !== '') {
       return prefill[key];
     }
-    if (key.includes('unit_price')) {
-      const priceKey = key.replace('_unit_price', '');
-      return defaultPrices[priceKey] || '';
+    if (key.endsWith('_unit_price')) {
+      const dbKey = key.replace('_unit_price', '');
+      return defaultPrices[dbKey] || '';
     }
     return '';
   };
@@ -120,23 +120,23 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
         </div>
         
         {[
-          { id: 'cable', label: 'Kabelverlegung', unit: 'm' },
-          { id: 'excavation', label: 'Erdaushub', unit: 'm³' },
-          { id: 'trench', label: 'Grabenherstellung', unit: 'm' },
-          { id: 'pipe', label: 'Rohrverlegung', unit: 'm' },
-          { id: 'backfill', label: 'Verfüllung', unit: 'm³' },
-          { id: 'asphalt', label: 'Asphaltarbeiten', unit: 'm²' }
+          { dbKey: 'cable_length', label: 'Kabelverlegung', unit: 'm' },
+          { dbKey: 'excavation_volume', label: 'Erdaushub', unit: 'm³' },
+          { dbKey: 'trench_length', label: 'Grabenherstellung', unit: 'm' },
+          { dbKey: 'pipe_length', label: 'Rohrverlegung', unit: 'm' },
+          { dbKey: 'backfill_volume', label: 'Verfüllung', unit: 'm³' },
+          { dbKey: 'asphalt_area', label: 'Asphaltarbeiten', unit: 'm²' }
         ].map((item) => (
-          <div key={item.id} className="work-item group">
+          <div key={item.dbKey} className="work-item group">
             <div className="work-item-header group-hover:text-blue-600 transition-colors">{item.label}</div>
             <div className="form-grid">
               <div className="form-group">
                 <label>Menge ({item.unit})</label>
-                <input type="number" step="0.01" name={`${item.id}_length` || `${item.id}_volume` || `${item.id}_area`} defaultValue={getValue(`${item.id}_length` || `${item.id}_volume` || `${item.id}_area`) as string} placeholder="0.00" />
+                <input type="number" step="0.01" name={item.dbKey} defaultValue={getValue(item.dbKey) as string} placeholder="0.00" />
               </div>
               <div className="form-group">
                 <label>Einzelpreis (€/{item.unit})</label>
-                <input type="number" step="0.01" name={`${item.id}_unit_price`} defaultValue={getValue(`${item.id}_unit_price`) as string} placeholder="0.00" className="text-right font-medium" />
+                <input type="number" step="0.01" name={`${item.dbKey}_unit_price`} defaultValue={getValue(`${item.dbKey}_unit_price`) as string} placeholder="0.00" className="text-right font-medium" />
               </div>
             </div>
           </div>
@@ -185,12 +185,12 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
         </div>
       </div>
 
-      <div className="sticky bottom-8 z-40 mx-auto max-w-2xl px-4">
-        <div className="total-preview shadow-2xl scale-[1.02] border-t border-white/20">
+      <div className="mt-12">
+        <div className="total-preview border-t border-white/20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-left">
-              <div className="label">Voraussichtliche Gesamtsumme</div>
-              <div className="text-[10px] opacity-50 uppercase tracking-widest">inkl. 19% gesetzl. MwSt.</div>
+              <div className="label text-white/70">Voraussichtliche Gesamtsumme</div>
+              <div className="text-[10px] opacity-50 uppercase tracking-widest text-white/50">inkl. 19% gesetzl. MwSt.</div>
             </div>
             <div className="amount" id="totalPreview">
               {total.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €

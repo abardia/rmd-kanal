@@ -1,12 +1,11 @@
-import { getOffer } from '@/actions';
+import { getOffer } from '@/lib/db';
 import { COMPANY_INFO } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const offerId = isNaN(parseInt(id)) ? id : parseInt(id);
-  const offer = await getOffer(offerId as any) as {
+  const offer = await getOffer(id) as {
     id: number;
     offer_number: string;
     offer_date: string;
@@ -34,8 +33,19 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
   return (
     <main>
       <div className="header">
-        <h1>📄 Angebot {offer.offer_number}</h1>
-        <Link href="/" className="nav-link" style={{ background: 'var(--accent)' }}>+ Neues Angebot</Link>
+        <div className="flex items-center gap-3">
+          <Link href="/" className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30 no-underline!">
+            <span className="text-xl font-bold">R</span>
+          </Link>
+          <h1>Angebot {offer.offer_number}</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href={`/api/offer/${offer.id}/pdf`} className="nav-link bg-blue-600 text-white! px-5 flex items-center gap-2" download>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            PDF Downloaden
+          </Link>
+          <Link href="/" className="nav-link">+ Neues Angebot</Link>
+        </div>
       </div>
 
       <div className="container">

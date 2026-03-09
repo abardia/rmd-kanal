@@ -1,5 +1,6 @@
-import { getOffers } from '@/actions';
+import { getOffers } from '@/lib/db';
 import Link from 'next/link';
+import ThemeToggle from '../ThemeToggle';
 
 export default async function OffersPage() {
   const offersRaw = await getOffers();
@@ -25,9 +26,10 @@ export default async function OffersPage() {
             <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">Alle gespeicherten Projekte</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/" className="nav-link bg-blue-600 text-white! px-5">+ Neues Angebot</Link>
           <Link href="/prices" className="nav-link">Preise</Link>
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -73,7 +75,7 @@ export default async function OffersPage() {
                   <Link 
                     href={`/api/offer/${offer.id}/pdf`} 
                     className="w-12 h-12 glass flex items-center justify-center rounded-2xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm" 
-                    target="_blank"
+                    download
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                   </Link>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOfferData } from '@/actions';
+import { getOffer } from '@/lib/db';
 import { COMPANY_INFO } from '@/types';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
@@ -139,10 +139,7 @@ export async function GET(
 ) {
   const { id } = await params;
   
-  // Use id directly as it could be an offer_number or numeric id
-  // getOfferData in actions calls getOffer in db which handles both
-  const offerId = isNaN(parseInt(id)) ? id : parseInt(id);
-  const offer = await getOfferData(offerId as any) as OfferData | undefined;
+  const offer = await getOffer(id) as OfferData | undefined;
 
   if (!offer) {
     return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
@@ -155,7 +152,7 @@ export async function GET(
     
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
-        'Content-Type': 'application/pdf',
+        'Content-Type': 'application/octet-stream',
         'Content-Disposition': `attachment; filename="Angebot_${offer.offer_number}.pdf"`,
       },
     });
