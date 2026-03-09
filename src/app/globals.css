@@ -33,7 +33,7 @@
 }
 
 @layer components {
-  .glass {
+  @utility glass {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -41,7 +41,7 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
   }
 
-  .glass-dark {
+  @utility glass-dark {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -49,33 +49,33 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
 
-  .apple-button {
+  @utility apple-button {
     @apply transition-all duration-200 ease-in-out font-semibold px-6 py-3 rounded-full text-center;
     background: var(--apple-blue);
     color: white;
+
+    &:hover {
+      @apply opacity-90 scale-[1.02];
+      box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+    }
+
+    &:active {
+      @apply scale-[0.98];
+    }
   }
 
-  .apple-button:hover {
-    @apply opacity-90 scale-[1.02];
-    box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
-  }
-
-  .apple-button:active {
-    @apply scale-[0.98];
-  }
-
-  .input-field {
+  @utility input-field {
     @apply w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none;
     background: rgba(255, 255, 255, 0.5);
     border-color: rgba(0, 0, 0, 0.1);
+
+    &:focus {
+      @apply border-blue-500 ring-2 ring-blue-500/20;
+      background: rgba(255, 255, 255, 0.8);
+    }
   }
 
-  .input-field:focus {
-    @apply border-blue-500 ring-2 ring-blue-500/20;
-    background: rgba(255, 255, 255, 0.8);
-  }
-
-  .nav-blur {
+  @utility nav-blur {
     @apply sticky top-0 z-50 w-full;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: saturate(180%) blur(20px);
