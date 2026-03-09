@@ -6,7 +6,9 @@ import {
 revalidatePath } from 'next/cache';
 import { 
 redirect } from 'next/navigation';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { 
+	GoogleGenerativeAI 
+} from '@google/generative-ai';
 
 function safeFloat(value: string | undefined, defaultVal = 0): number { 
   try {
