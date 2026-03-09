@@ -6,11 +6,8 @@ import {
 revalidatePath } from 'next/cache';
 import { 
 redirect } from 'next/navigation';
-import {
-	GoogleGenAI
-}
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
- from '@google/genai';
 function safeFloat(value: string | undefined, defaultVal = 0): number { 
   try {
     if (!value || value === '') return defaultVal;
@@ -184,16 +181,10 @@ Benötigte Felder:
 Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null. TEXT: `;
 	
     
-  const ai = new GoogleGenAI({apiKey: 
-  	apikey
-  });
-  
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-   const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt + '\n\nText:\n' + text,
-    });
-  
+  const result = await model.generateContent(prompt + '\n\nText:\n' + text);
   const response = result.response.text();
 
   let cleaned = response.trim();
