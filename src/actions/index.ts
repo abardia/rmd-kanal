@@ -189,7 +189,7 @@ Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird,
   });
   
 
-   const response = await ai.models.generateContent({
+   const result = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt + '\n\nText:\n' + text,
     });
