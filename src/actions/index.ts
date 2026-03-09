@@ -172,10 +172,10 @@ export async function generateOffer(formData: FormData) {
 }
 
 export async function extractWithLLM(text: string) {
-  const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyBtbQqc23rv_sjLk67pyFj5_kDabpU_RF0';
+  const apiKey = process.env.GEMINI_API_KEY;
   
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
   const prompt = `Extrahiere aus dem folgenden Text alle relevanten Informationen für ein Tiefbau-Angebot und gib das Ergebnis als JSON zurück.
 
