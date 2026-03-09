@@ -1,11 +1,15 @@
 'use server';
 
-import { updatePrices as dbUpdatePrices, saveOffer } from '@/lib/db';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { 
+updatePrices as dbUpdatePrices, saveOffer } from '@/lib/db';
+import { 
+revalidatePath } from 'next/cache';
+import { 
+redirect } from 'next/navigation';
 import {
 	GoogleGenAI
 }
+
  from '@google/genai';
 function safeFloat(value: string | undefined, defaultVal = 0): number { 
   try {
@@ -117,7 +121,7 @@ export async function generateOffer(formData: FormData) {
     total += depthSurcharge;
     workItems.push({
       position: workItems.length + 1,
-      description: 'Erschwerte Grabungsarbeiten (>1.5m Tiefe)',
+      description: 'Erschwerte Grabungsarbeiten (>1.5m  Tiefe)',
       quantity: excavationDepth - 1.5,
       unit: 'm',
       unit_price: total * 0.1,
