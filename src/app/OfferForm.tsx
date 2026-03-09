@@ -62,183 +62,149 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
   };
 
   return (
-    <form action={generateOffer} id="offerForm" onChange={calculateTotal}>
+    <form action={generateOffer} id="offerForm" onChange={calculateTotal} className="pb-24">
       <div className="form-section">
-        <div className="section-title">👤 Kunde</div>
+        <div className="section-title">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+          Kundendetails
+        </div>
         <div className="form-grid">
           <div className="form-group">
-            <label>Name *</label>
-            <input type="text" name="customer_name" defaultValue={getValue('customer_name') as string} required />
+            <label>Vollständiger Name *</label>
+            <input type="text" name="customer_name" defaultValue={getValue('customer_name') as string} required placeholder="Max Mustermann" />
           </div>
           <div className="form-group">
-            <label>Firma</label>
-            <input type="text" name="customer_company" defaultValue={getValue('customer_company') as string} />
+            <label>Firma (optional)</label>
+            <input type="text" name="customer_company" defaultValue={getValue('customer_company') as string} placeholder="Muster GmbH" />
           </div>
           <div className="form-group full-width">
-            <label>Adresse</label>
-            <input type="text" name="customer_address" defaultValue={getValue('customer_address') as string} placeholder="Straße, PLZ, Ort" />
+            <label>Anschrift</label>
+            <input type="text" name="customer_address" defaultValue={getValue('customer_address') as string} placeholder="Musterstraße 123, 12345 Berlin" />
           </div>
           <div className="form-group">
             <label>Telefon</label>
-            <input type="tel" name="customer_phone" defaultValue={getValue('customer_phone') as string} />
+            <input type="tel" name="customer_phone" defaultValue={getValue('customer_phone') as string} placeholder="+49 000 0000000" />
           </div>
           <div className="form-group">
             <label>E-Mail</label>
-            <input type="email" name="customer_email" defaultValue={getValue('customer_email') as string} />
+            <input type="email" name="customer_email" defaultValue={getValue('customer_email') as string} placeholder="max@mustermann.de" />
           </div>
         </div>
       </div>
 
       <div className="form-section">
-        <div className="section-title">📍 Projekt</div>
+        <div className="section-title">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          Projektstandort
+        </div>
         <div className="form-grid">
           <div className="form-group full-width">
-            <label>Projektname *</label>
-            <input type="text" name="project_name" defaultValue={getValue('project_name') as string} required />
+            <label>Bezeichnung des Projekts *</label>
+            <input type="text" name="project_name" defaultValue={getValue('project_name') as string} required placeholder="z.B. Erschließung Neubaugebiet" />
           </div>
           <div className="form-group full-width">
             <label>Baustelle / Ort</label>
-            <input type="text" name="project_location" defaultValue={getValue('project_location') as string} />
+            <input type="text" name="project_location" defaultValue={getValue('project_location') as string} placeholder="Hofgartenweg 1, Hannover" />
           </div>
           <div className="form-group full-width">
-            <label>Beschreibung</label>
-            <textarea name="project_description" placeholder="Kurze Beschreibung der Arbeiten..." defaultValue={getValue('project_description') as string} />
+            <label>Leistungsbeschreibung</label>
+            <textarea name="project_description" placeholder="Detaillierte Aufzählung der geplanten Tätigkeiten..." defaultValue={getValue('project_description') as string} className="min-h-[120px]" />
           </div>
         </div>
       </div>
 
       <div className="form-section">
-        <div className="section-title">🔧 Leistungen</div>
+        <div className="section-title">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+          Leistungsumfang
+        </div>
         
-        <div className="work-item">
-          <div className="work-item-header">Kabelverlegung</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Menge (m)</label>
-              <input type="number" step="0.01" name="cable_length" defaultValue={getValue('cable_length') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m (€)</label>
-              <input type="number" step="0.01" name="cable_unit_price" defaultValue={getValue('cable_unit_price') as string} placeholder="0.00" />
-            </div>
-          </div>
-        </div>
-
-        <div className="work-item">
-          <div className="work-item-header">Erdaushub</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Menge (m³)</label>
-              <input type="number" step="0.01" name="excavation_volume" defaultValue={getValue('excavation_volume') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m³ (€)</label>
-              <input type="number" step="0.01" name="excavation_unit_price" defaultValue={getValue('excavation_unit_price') as string} placeholder="0.00" />
+        {[
+          { id: 'cable', label: 'Kabelverlegung', unit: 'm' },
+          { id: 'excavation', label: 'Erdaushub', unit: 'm³' },
+          { id: 'trench', label: 'Grabenherstellung', unit: 'm' },
+          { id: 'pipe', label: 'Rohrverlegung', unit: 'm' },
+          { id: 'backfill', label: 'Verfüllung', unit: 'm³' },
+          { id: 'asphalt', label: 'Asphaltarbeiten', unit: 'm²' }
+        ].map((item) => (
+          <div key={item.id} className="work-item group">
+            <div className="work-item-header group-hover:text-blue-600 transition-colors">{item.label}</div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Menge ({item.unit})</label>
+                <input type="number" step="0.01" name={`${item.id}_length` || `${item.id}_volume` || `${item.id}_area`} defaultValue={getValue(`${item.id}_length` || `${item.id}_volume` || `${item.id}_area`) as string} placeholder="0.00" />
+              </div>
+              <div className="form-group">
+                <label>Einzelpreis (€/{item.unit})</label>
+                <input type="number" step="0.01" name={`${item.id}_unit_price`} defaultValue={getValue(`${item.id}_unit_price`) as string} placeholder="0.00" className="text-right font-medium" />
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="work-item">
-          <div className="work-item-header">Grabenherstellung</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Menge (m)</label>
-              <input type="number" step="0.01" name="trench_length" defaultValue={getValue('trench_length') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m (€)</label>
-              <input type="number" step="0.01" name="trench_unit_price" defaultValue={getValue('trench_unit_price') as string} placeholder="0.00" />
-            </div>
-          </div>
-        </div>
-
-        <div className="work-item">
-          <div className="work-item-header">Rohrverlegung</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Menge (m)</label>
-              <input type="number" step="0.01" name="pipe_length" defaultValue={getValue('pipe_length') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m (€)</label>
-              <input type="number" step="0.01" name="pipe_unit_price" defaultValue={getValue('pipe_unit_price') as string} placeholder="0.00" />
-            </div>
-          </div>
-        </div>
-
-        <div className="work-item">
-          <div className="work-item-header">Verfüllung</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Menge (m³)</label>
-              <input type="number" step="0.01" name="backfill_volume" defaultValue={getValue('backfill_volume') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m³ (€)</label>
-              <input type="number" step="0.01" name="backfill_unit_price" defaultValue={getValue('backfill_unit_price') as string} placeholder="0.00" />
-            </div>
-          </div>
-        </div>
-
-        <div className="work-item">
-          <div className="work-item-header">Asphaltarbeiten</div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Fläche (m²)</label>
-              <input type="number" step="0.01" name="asphalt_area" defaultValue={getValue('asphalt_area') as string} placeholder="0" />
-            </div>
-            <div className="form-group">
-              <label>Preis/m² (€)</label>
-              <input type="number" step="0.01" name="asphalt_unit_price" defaultValue={getValue('asphalt_unit_price') as string} placeholder="0.00" />
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="form-section">
-        <div className="section-title">⚙️ Zusatzleistungen</div>
+        <div className="section-title">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          Spezifikationen & Ressourcen
+        </div>
         <div className="form-grid">
           <div className="form-group">
-            <label>Bodentyp</label>
+            <label>Bodenbeschaffenheit</label>
             <select name="soil_type" defaultValue={getValue('soil_type') as string || 'normal'}>
-              <option value="normal">Normaler Boden</option>
+              <option value="normal">Normaler Boden (Referenz)</option>
               <option value="sandy">Sandiger Boden (+5%)</option>
               <option value="clay">Toniger Boden (+10%)</option>
               <option value="rocky">Felsiger Boden (+15%)</option>
             </select>
           </div>
           <div className="form-group">
-            <label>Grabtiefe (m)</label>
-            <input type="number" step="0.1" name="excavation_depth" defaultValue={getValue('excavation_depth') as string} placeholder="0" />
-            <span className="info-text">Aufschlag ab 1,5m Tiefe</span>
+            <label>Maximale Grabtiefe (m)</label>
+            <div className="relative">
+              <input type="number" step="0.1" name="excavation_depth" defaultValue={getValue('excavation_depth') as string} placeholder="0" />
+              {/* <span className="absolute right-3 top-3 text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-lg">Aufschlag ab 1.5m</span> */}
+            </div>
+            <span className="info-text text-amber-600 font-medium">⚠️ Automatischer Tiefenaufschlag ab 1,5m</span>
           </div>
           <div className="form-group">
-            <label>Geräte</label>
-            <input type="text" name="equipment" defaultValue={getValue('equipment') as string} placeholder="z.B. Bagger, LKW" />
+            <label>Geräteeinsatz</label>
+            <input type="text" name="equipment" defaultValue={getValue('equipment') as string} placeholder="z.B. Minibagger, 3.5t Rüttelplatte" />
           </div>
           <div className="form-group">
-            <label>Gerätepreis (€)</label>
-            <input type="number" step="0.01" name="equipment_price" defaultValue={getValue('equipment_price') as string} placeholder="0.00" />
+            <label>Miet-/Gerätekosten (€)</label>
+            <input type="number" step="0.01" name="equipment_price" defaultValue={getValue('equipment_price') as string} placeholder="0.00" className="font-medium" />
           </div>
           <div className="form-group">
-            <label>Arbeiter (Tage)</label>
+            <label>Personalaufwand (Manntage)</label>
             <input type="number" name="workers" defaultValue={getValue('workers') as string} placeholder="0" />
           </div>
           <div className="form-group">
-            <label>Arbeiterkosten (€)</label>
-            <input type="number" step="0.01" name="worker_price" placeholder="0.00" />
+            <label>Gesamte Personalkosten (€)</label>
+            <input type="number" step="0.01" name="worker_price" placeholder="0.00" className="font-medium" />
           </div>
         </div>
       </div>
 
-      <div className="total-preview">
-        <div className="label">Geschätzter Gesamtpreis (inkl. 19% MwSt.)</div>
-        <div className="amount" id="totalPreview">{total.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</div>
+      <div className="sticky bottom-8 z-40 mx-auto max-w-2xl px-4">
+        <div className="total-preview shadow-2xl scale-[1.02] border-t border-white/20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-left">
+              <div className="label">Voraussichtliche Gesamtsumme</div>
+              <div className="text-[10px] opacity-50 uppercase tracking-widest">inkl. 19% gesetzl. MwSt.</div>
+            </div>
+            <div className="amount" id="totalPreview">
+              {total.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+            </div>
+          </div>
+          
+          <button type="submit" className="btn-primary mt-6">
+            <span className="flex items-center justify-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              Angebot als PDF generieren
+            </span>
+          </button>
+        </div>
       </div>
-
-      <button type="submit" className="btn btn-primary">
-        📄 PDF-Angebot erstellen
-      </button>
     </form>
   );
 }

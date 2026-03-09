@@ -1,6 +1,7 @@
 
 import { getPricesData } from '@/actions';
 import OfferForm from './OfferForm';
+import Link from 'next/link';
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ prefill?: string }> }) {
   const params = await searchParams;
@@ -20,21 +21,31 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
 
   return (
     <main>
-      <div className="header">
-        <div>
-          <h1>🏗️ Tiefbau Angebot
-            {Object.keys(prefill).length > 0 && <span className="prefill-badge">KI-vorausgefüllt</span>}
-          </h1>
-          <p>Erstellen Sie schnell ein professionelles Angebot</p>
+      <nav className="header">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+            <span className="text-xl font-bold">R</span>
+          </div>
+          <div>
+            <h1 className="leading-tight">Tiefbau-Manager
+              {Object.keys(prefill).length > 0 && <span className="prefill-badge">KI-vorausgefüllt</span>}
+            </h1>
+            <p className="text-[10px] text-gray-500 font-medium uppercase tracking-widest">RMD Kanaltechnik</p>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <a href="/prices" className="nav-link">💰 Preise</a>
-          <a href="/llm" className="nav-link">🤖 KI-Modus</a>
-          <a href="/offers" className="nav-link">📋 Alle Angebote</a>
+        <div className="flex gap-2">
+          <Link href="/offers" className="nav-link">Angebote</Link>
+          <Link href="/prices" className="nav-link">Preise</Link>
+          <Link href="/llm" className="nav-link bg-black text-white! px-5">KI-Modus</Link>
         </div>
-      </div>
+      </nav>
 
-      <div className="container">
+      <div className="container max-w-4xl pt-12">
+        <div className="mb-12 text-center">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Neues Angebot erstellen</h2>
+          <p className="text-gray-500 text-lg max-w-xl mx-auto">Präzise Kalkulationen und professionelle PDFs in Sekunden.</p>
+        </div>
+        
         <OfferForm defaultPrices={defaultPrices} prefill={prefill} />
       </div>
     </main>

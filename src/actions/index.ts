@@ -214,7 +214,7 @@ Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird,
       max_tokens: 2048
     });
     
-  const response = result.response.text();
+  const response = result.choices[0].message.content || "";
   
   let cleaned = response.trim();
   if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
