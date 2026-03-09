@@ -1,11 +1,13 @@
 'use server';
 
-import { getPrices, updatePrices as dbUpdatePrices, getOffers, getOffer, saveOffer, getDefaultPrices } from '@/lib/db';
+import { updatePrices as dbUpdatePrices, saveOffer } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import OpenAI from "openai"
-
-function safeFloat(value: string | undefined, defaultVal = 0): number {
+import {
+	GoogleGenAI
+}
+ from '@google/genai';
+function safeFloat(value: string | undefined, defaultVal = 0): number { 
   try {
     if (!value || value === '') return defaultVal;
     return parseFloat(value);
@@ -14,32 +16,10 @@ function safeFloat(value: string | undefined, defaultVal = 0): number {
   }
 }
 
-export async function getPricesData() {
-  const prices = await getPrices();
-  if (!prices || prices.length === 0) {
-    return getDefaultPrices().map(p => ({ ...p, id: 0, name: p.item_key, unit: 'm' }));
-  }
-  return prices;
-}
-
-export { getPrices };
-
 export async function updatePrices(formData: FormData) {
   await dbUpdatePrices(formData);
   revalidatePath('/prices');
 }
-
-export async function getOffersData() {
-  return await getOffers();
-}
-
-export { getOffers };
-
-export async function getOfferData(id: number | string) {
-  return await getOffer(id);
-}
-
-export { getOffer };
 
 export async function generateOffer(formData: FormData) {
   const now = new Date();
@@ -57,12 +37,12 @@ export async function generateOffer(formData: FormData) {
   }> = [];
 
   const items = [
-    { key: 'cable_length', name: 'Kabelverlegung', qty: formData.get('cable_length'), price: formData.get('cable_unit_price'), unit: 'm' },
-    { key: 'excavation_volume', name: 'Erdaushub', qty: formData.get('excavation_volume'), price: formData.get('excavation_unit_price'), unit: 'm³' },
-    { key: 'trench_length', name: 'Grabenherstellung', qty: formData.get('trench_length'), price: formData.get('trench_unit_price'), unit: 'm' },
-    { key: 'pipe_length', name: 'Rohrverlegung', qty: formData.get('pipe_length'), price: formData.get('pipe_unit_price'), unit: 'm' },
-    { key: 'backfill_volume', name: 'Verfüllung', qty: formData.get('backfill_volume'), price: formData.get('backfill_unit_price'), unit: 'm³' },
-    { key: 'asphalt_area', name: 'Asphaltarbeiten', qty: formData.get('asphalt_area'), price: formData.get('asphalt_unit_price'), unit: 'm²' },
+    { key: 'cable_length', name: 'Kabelverlegung', qty: formData.get('cable_length'), price: formData.get('cable_length_unit_price'), unit: 'm' },
+    { key: 'excavation_volume', name: 'Erdaushub', qty: formData.get('excavation_volume'), price: formData.get('excavation_volume_unit_price'), unit: 'm³' },
+    { key: 'trench_length', name: 'Grabenherstellung', qty: formData.get('trench_length'), price: formData.get('trench_length_unit_price'), unit: 'm' },
+    { key: 'pipe_length', name: 'Rohrverlegung', qty: formData.get('pipe_length'), price: formData.get('pipe_length_unit_price'), unit: 'm' },
+    { key: 'backfill_volume', name: 'Verfüllung', qty: formData.get('backfill_volume'), price: formData.get('backfill_volume_unit_price'), unit: 'm³' },
+    { key: 'asphalt_area', name: 'Asphaltarbeiten', qty: formData.get('asphalt_area'), price: formData.get('asphalt_area_unit_price'), unit: 'm²' },
   ];
 
   let total = 0;
@@ -172,13 +152,7 @@ export async function generateOffer(formData: FormData) {
 }
 
 export async function extractWithLLM(text: string) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  
-  const openai = new OpenAI({
-    apiKey: apiKey,
-    baseURL: "https://api.us-west-2.modal.direct" // Der Modal-Endpunkt
-  });
-  
+  const apikey = process.env.GEMINI_API_KEY;
   
 
   const prompt = `Extrahiere aus dem folgenden Text alle relevanten Informationen für ein Tiefbau-Angebot und gib das Ergebnis als JSON zurück.
@@ -203,23 +177,26 @@ Benötigte Felder:
 - equipment: Geräte (z.B. Bagger, LKW) falls genannt
 - workers: Anzahl Arbeitertage falls genannt
 
-Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null.`;
+Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null. TEXT: `;
 	
-  const result = await openai.chat.completions.create({
-      model: "zai-org/GLM-5-FP8", 
-      messages: [{ 
-        role: "user", content: prompt 
-        }
-      ],
-      max_tokens: 2048
-    });
     
-  const response = result.choices[0].message.content || "";
+  const ai = new GoogleGenAI({apiKey: 
+  	apikey
+  });
   
+
+   const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt + '\n\nText:\n' + text,
+    });
+  
+  const response = result.response.text();
+
   let cleaned = response.trim();
   if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
   if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
   if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+  cleaned = cleaned.trim()
   
-  return JSON.parse(cleaned.trim());
+  return JSON.parse(cleaned);
 }
