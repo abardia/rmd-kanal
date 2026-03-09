@@ -155,7 +155,7 @@ export async function generateOffer(formData: FormData) {
 }
 
 export async function extractWithLLM(text: string) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  //const apiKey = process.env.GEMINI_API_KEY;
 
   const prompt = `Extrahiere aus dem folgenden Text alle relevanten Informationen für ein Tiefbau-Angebot und gib das Ergebnis als JSON zurück.
 
@@ -182,17 +182,21 @@ Benötigte Felder:
 Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null. TEXT: `;
 	
     
-  const genAI = new GoogleGenerativeAI(apiKey);
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
-  const result = await model.generateContent(prompt + '\n\nText:\n' + text);
-  const response = result.response.text();
-
-  let cleaned = response.trim();
-  if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
-  if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
-  if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
-  cleaned = cleaned.trim()
-  
+	let cleaned = "";
+  try {
+	  const result = await model.generateContent(prompt + '\n\nText:\n' + text);
+	  const response = result.response.text();
+	
+	  let cleaned = response.trim();
+	  if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
+	  if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
+	  if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+  	  cleaned = cleaned.trim()
+  } catch {
+	    console.error("Error", error);
+  }
+  cleaned = cleaned;
   return JSON.parse(cleaned);
 }
