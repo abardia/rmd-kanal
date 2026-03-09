@@ -205,7 +205,7 @@ Benötigte Felder:
 
 Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird, lasse es leer oder null.`;
 	
-  const response = await openai.chat.completions.create({
+  const result = await openai.chat.completions.create({
       model: "zai-org/GLM-5-FP8", 
       messages: [{ 
         role: "user", content: prompt 
