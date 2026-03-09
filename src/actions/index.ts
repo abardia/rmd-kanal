@@ -191,7 +191,7 @@ Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird,
 	  const result = await model.generateContent(prompt + '\n\nText:\n' + text);
 	  const response = result.response.text();
 	
-	  let cleaned = response.trim();
+	  cleaned = response.trim();
 	  if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
 	  if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
 	  if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
@@ -200,5 +200,27 @@ Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird,
 	    console.error("Error", error);
   }
   cleaned = cleaned;
-  return JSON.parse(cleaned);
-}
+  if (cleaned && cleaned.trim().length > 0)
+  	return JSON.parse(cleaned);
+  else
+  	return JSON.parse(`{
+  	  "customer_name": Max,
+  	  "customer_company": Musterhaus,
+  	  "customer_address": null,
+  	  "customer_phone": null,
+  	  "customer_email": null,
+  	  "project_name": null,
+  	  "project_location": null,
+  	  "project_description": null,
+  	  "cable_length": 0,
+  	  "excavation_volume": null,
+  	  "trench_length": null,
+  	  "pipe_length": null,
+  	  "backfill_volume": null,
+  	  "asphalt_area": null,
+  	  "excavation_depth": null,
+  	  "soil_type": null,
+  	  "equipment": [],
+  	  "workers": null
+  	}`)
+ }
