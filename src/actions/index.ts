@@ -194,7 +194,7 @@ Gib nur JSON zurück, ohne zusätzlichen Text. Wenn ein Feld nicht genannt wird,
 	  if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
 	  if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
   	  cleaned = cleaned.trim()
-  } catch {
+  } catch (error)  {
 	    console.error("Error", error);
   }
   cleaned = cleaned;
