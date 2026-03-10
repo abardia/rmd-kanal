@@ -1,13 +1,15 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { neon } from '@neondatabase/serverless'
-const dbPath = path.resolve(process.cwd(), 'offers.db');
-const db = new Database(dbPath);
+import { db } from './firebase';
+import { collection, getDocs, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
 
 export async function getPrices() {
   try {
-    const rows = db.prepare('SELECT * FROM price_list ORDER BY id').all();
-    return rows;
+    const pricesRef = collection(db, 'price_list');
+    const q = query(pricesRef, orderBy('id'));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      return getDefaultPrices();
+    }
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch {
     return getDefaultPrices();
   }
@@ -19,22 +21,17 @@ export async function updatePrices(formData: FormData) {
     'pipe_length', 'backfill_volume', 'asphalt_area'
   ];
   
-  const insert = db.prepare(`
-    INSERT INTO price_list (item_key, name, unit, default_price)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT (item_key) DO UPDATE SET default_price = excluded.default_price
-  `);
-  
-  const transaction = db.transaction(() => {
-    for (const key of keys) {
-      const price = formData.get(`price_${key}`);
-      if (price) {
-        insert.run(key, getPriceName(key), getPriceUnit(key), parseFloat(price as string));
-      }
+  for (const key of keys) {
+    const price = formData.get(`price_${key}`);
+    if (price) {
+      await setDoc(doc(db, 'price_list', key), {
+        item_key: key,
+        name: getPriceName(key),
+        unit: getPriceUnit(key),
+        default_price: parseFloat(price as string),
+      }, { merge: true });
     }
-  });
-  
-  transaction();
+  }
 }
 
 function getPriceName(key: string): string {
@@ -74,8 +71,10 @@ export function getDefaultPrices(): Array<{ item_key: string; default_price: num
 
 export async function getOffers() {
   try {
-    const rows = db.prepare('SELECT * FROM offers ORDER BY created_at DESC').all();
-    return rows;
+    const offersRef = collection(db, 'offers');
+    const q = query(offersRef, orderBy('created_at', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (err) {
     console.error('getOffers error:', err);
     return [];
@@ -84,11 +83,19 @@ export async function getOffers() {
 
 export async function getOffer(id: number | string) {
   try {
-    // Check if id is offer_number or id
     if (typeof id === 'string' && id.startsWith('AN-')) {
-       return db.prepare('SELECT * FROM offers WHERE offer_number = ?').get(id);
+      const offersRef = collection(db, 'offers');
+      const q = query(offersRef);
+      const snapshot = await getDocs(q);
+      const found = snapshot.docs.find(doc => doc.data().offer_number === id);
+      return found ? { id: found.id, ...found.data() } : null;
     }
-    return db.prepare('SELECT * FROM offers WHERE id = ?').get(id);
+    const docRef = doc(db, 'offers', String(id));
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
   } catch (err) {
     console.error('getOffer error:', err);
     return null;
@@ -112,24 +119,9 @@ export async function saveOffer(offer: {
   vat: number;
   total: number;
 }) {
-  const insert = db.prepare(`
-    INSERT INTO offers (
-      offer_number, offer_date, valid_until,
-      customer_name, customer_company, customer_address, customer_phone, customer_email,
-      project_name, project_location, project_description,
-      work_items_json, subtotal, vat, total
-    ) VALUES (
-      ?, ?, ?,
-      ?, ?, ?, ?, ?,
-      ?, ?, ?,
-      ?, ?, ?, ?
-    )
-  `);
-  
-  insert.run(
-    offer.offer_number, offer.offer_date, offer.valid_until,
-    offer.customer_name, offer.customer_company, offer.customer_address, offer.customer_phone, offer.customer_email,
-    offer.project_name, offer.project_location, offer.project_description,
-    offer.work_items_json, offer.subtotal, offer.vat, offer.total
-  );
+  const offerData = {
+    ...offer,
+    created_at: new Date().toISOString(),
+  };
+  await setDoc(doc(db, 'offers', offer.offer_number), offerData);
 }
