@@ -5,7 +5,13 @@ import Link from 'next/link';
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const offer = await getOffer(id) as {
+  const rawOffer = await getOffer(id);
+  const offer = rawOffer ? {
+    ...rawOffer,
+    subtotal: Number(rawOffer.subtotal),
+    vat: Number(rawOffer.vat),
+    total: Number(rawOffer.total),
+  } as {
     id: number;
     offer_number: string;
     offer_date: string;
@@ -22,13 +28,18 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
     subtotal: number;
     vat: number;
     total: number;
-  } | undefined;
+  } : undefined;
 
   if (!offer) {
     notFound();
   }
 
-  const workItems = JSON.parse(offer.work_items_json);
+  const workItems = JSON.parse(offer.work_items_json).map((item: Record<string, unknown>) => ({
+    ...item,
+    unit_price: Number(item.unit_price),
+    total: Number(item.total),
+    quantity: Number(item.quantity),
+  }));
 
   return (
     <main>

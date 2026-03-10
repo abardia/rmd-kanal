@@ -139,13 +139,25 @@ export async function GET(
 ) {
   const { id } = await params;
   
-  const offer = await getOffer(id) as unknown as OfferData | undefined;
-
-  if (!offer) {
+  const offerRaw = await getOffer(id);
+  
+  if (!offerRaw) {
     return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
   }
 
-  const workItems = JSON.parse(offer.work_items_json);
+  const offer = {
+    ...offerRaw,
+    subtotal: Number(offerRaw.subtotal),
+    vat: Number(offerRaw.vat),
+    total: Number(offerRaw.total),
+  } as OfferData;
+
+  const workItems = JSON.parse(offer.work_items_json).map((item: Record<string, unknown>) => ({
+    ...item,
+    unit_price: Number(item.unit_price),
+    total: Number(item.total),
+    quantity: Number(item.quantity),
+  }));
 
   try {
     const pdfBuffer = await renderToBuffer(<OfferPDF offer={offer} workItems={workItems} />);
