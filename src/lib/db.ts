@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
-
+import { neon } from '@neondatabase/serverless'
 const dbPath = path.resolve(process.cwd(), 'offers.db');
 const db = new Database(dbPath);
 

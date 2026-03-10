@@ -155,7 +155,6 @@ export async function generateOffer(formData: FormData) {
 }
 
 export async function extractWithLLM(text: string) {
-  //const apiKey = process.env.GEMINI_API_KEY;
 
   const prompt = `Extrahiere aus dem folgenden Text alle relevanten Informationen für ein Tiefbau-Angebot und gib das Ergebnis als JSON zurück.
 
