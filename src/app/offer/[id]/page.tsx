@@ -5,13 +5,7 @@ import Link from 'next/link';
 
 export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const rawOffer = await getOffer(id);
-  const offer = rawOffer ? {
-    ...rawOffer,
-    subtotal: Number(rawOffer.subtotal),
-    vat: Number(rawOffer.vat),
-    total: Number(rawOffer.total),
-  } as {
+  const offer = await getOffer(id) as {
     id: number;
     offer_number: string;
     offer_date: string;
@@ -28,7 +22,7 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
     subtotal: number;
     vat: number;
     total: number;
-  } : undefined;
+  } | undefined;
 
   if (!offer) {
     notFound();

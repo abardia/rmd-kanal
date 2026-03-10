@@ -145,12 +145,7 @@ export async function GET(
     return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
   }
 
-  const offer = {
-    ...offerRaw,
-    subtotal: Number(offerRaw.subtotal),
-    vat: Number(offerRaw.vat),
-    total: Number(offerRaw.total),
-  } as OfferData;
+  const offer = offerRaw as unknown as OfferData;
 
   const workItems = JSON.parse(offer.work_items_json).map((item: Record<string, unknown>) => ({
     ...item,

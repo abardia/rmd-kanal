@@ -81,6 +81,8 @@ export async function getOffers() {
     `;
     return rows.map((row: Record<string, unknown>) => ({
       ...row,
+      offer_date: row.offer_date instanceof Date ? row.offer_date.toISOString().split('T')[0] : row.offer_date,
+      valid_until: row.valid_until instanceof Date ? row.valid_until.toISOString().split('T')[0] : row.valid_until,
       subtotal: Number(row.subtotal),
       vat: Number(row.vat),
       total: Number(row.total),
@@ -100,7 +102,16 @@ export async function getOffer(id: number | string): Promise<Record<string, unkn
     } else {
       rows = await sql`SELECT * FROM offers WHERE id = ${id}`;
     }
-    return rows.length > 0 ? rows[0] : null;
+    if (rows.length === 0) return null;
+    const row = rows[0];
+    return {
+      ...row,
+      offer_date: row.offer_date instanceof Date ? row.offer_date.toISOString().split('T')[0] : row.offer_date,
+      valid_until: row.valid_until instanceof Date ? row.valid_until.toISOString().split('T')[0] : row.valid_until,
+      subtotal: Number(row.subtotal),
+      vat: Number(row.vat),
+      total: Number(row.total),
+    };
   } catch (err) {
     console.error('getOffer error:', err);
     return null;
