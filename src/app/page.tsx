@@ -41,7 +41,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
         <div className="flex items-center gap-2">
           <Link href="/offers" className="nav-link">Angebote</Link>
           <Link href="/prices" className="nav-link">Preise</Link>
-          <Link href="/llm" className="nav-link bg-black text-white! dark:bg-white dark:text-black! px-5">KI-Modus</Link>
+          <Link href="" className="nav-link bg-black text-white! dark:bg-white dark:text-black! px-5">KI-Modus</Link>
           <ThemeToggle />
         </div>
       </nav>
