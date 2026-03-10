@@ -121,6 +121,12 @@ export async function saveOffer(offer: {
 }) {
   const offerData = {
     ...offer,
+    customer_company: offer.customer_company || null,
+    customer_address: offer.customer_address || null,
+    customer_phone: offer.customer_phone || null,
+    customer_email: offer.customer_email || null,
+    project_location: offer.project_location || null,
+    project_description: offer.project_description || null,
     created_at: new Date().toISOString(),
   };
   await setDoc(doc(db, 'offers', offer.offer_number), offerData);
