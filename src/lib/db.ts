@@ -1,15 +1,18 @@
-import { db } from './firebase';
-import { collection, getDocs, doc, setDoc, getDoc, query, orderBy } from 'firebase/firestore';
+import { neon } from '@neondatabase/serverless';
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not set');
+}
+const sql = neon(databaseUrl);
 
 export async function getPrices() {
   try {
-    const pricesRef = collection(db, 'price_list');
-    const q = query(pricesRef, orderBy('id'));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
+    const rows = await sql`SELECT * FROM price_list ORDER BY id`;
+    if (rows.length === 0) {
       return getDefaultPrices();
     }
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return rows;
   } catch {
     return getDefaultPrices();
   }
@@ -24,12 +27,11 @@ export async function updatePrices(formData: FormData) {
   for (const key of keys) {
     const price = formData.get(`price_${key}`);
     if (price) {
-      await setDoc(doc(db, 'price_list', key), {
-        item_key: key,
-        name: getPriceName(key),
-        unit: getPriceUnit(key),
-        default_price: parseFloat(price as string),
-      }, { merge: true });
+      await sql`
+        INSERT INTO price_list (item_key, name, unit, default_price)
+        VALUES (${key}, ${getPriceName(key)}, ${getPriceUnit(key)}, ${parseFloat(price as string)})
+        ON CONFLICT (item_key) DO UPDATE SET default_price = ${parseFloat(price as string)}
+      `;
     }
   }
 }
@@ -71,10 +73,10 @@ export function getDefaultPrices(): Array<{ item_key: string; default_price: num
 
 export async function getOffers() {
   try {
-    const offersRef = collection(db, 'offers');
-    const q = query(offersRef, orderBy('created_at', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const rows = await sql`
+      SELECT * FROM offers ORDER BY created_at DESC
+    `;
+    return rows;
   } catch (err) {
     console.error('getOffers error:', err);
     return [];
@@ -83,19 +85,14 @@ export async function getOffers() {
 
 export async function getOffer(id: number | string): Promise<Record<string, unknown> | null> {
   try {
-    if (typeof id === 'string' && id.startsWith('AN-')) {
-      const offersRef = collection(db, 'offers');
-      const q = query(offersRef);
-      const snapshot = await getDocs(q);
-      const found = snapshot.docs.find(doc => doc.data().offer_number === id);
-      return found ? { id: found.id, ...found.data() } : null;
+    const idStr = String(id);
+    let rows;
+    if (idStr.startsWith('AN-')) {
+      rows = await sql`SELECT * FROM offers WHERE offer_number = ${idStr}`;
+    } else {
+      rows = await sql`SELECT * FROM offers WHERE id = ${id}`;
     }
-    const docRef = doc(db, 'offers', String(id));
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    }
-    return null;
+    return rows.length > 0 ? rows[0] : null;
   } catch (err) {
     console.error('getOffer error:', err);
     return null;
@@ -119,15 +116,32 @@ export async function saveOffer(offer: {
   vat: number;
   total: number;
 }) {
-  const offerData = {
-    ...offer,
-    customer_company: offer.customer_company || null,
-    customer_address: offer.customer_address || null,
-    customer_phone: offer.customer_phone || null,
-    customer_email: offer.customer_email || null,
-    project_location: offer.project_location || null,
-    project_description: offer.project_description || null,
-    created_at: new Date().toISOString(),
-  };
-  await setDoc(doc(db, 'offers', offer.offer_number), offerData);
+  await sql`
+    INSERT INTO offers (
+      offer_number, offer_date, valid_until, customer_name, 
+      customer_company, customer_address, customer_phone, customer_email,
+      project_name, project_location, project_description,
+      work_items_json, subtotal, vat, total, created_at
+    ) VALUES (
+      ${offer.offer_number}, ${offer.offer_date}, ${offer.valid_until}, ${offer.customer_name},
+      ${offer.customer_company || null}, ${offer.customer_address || null}, ${offer.customer_phone || null}, ${offer.customer_email || null},
+      ${offer.project_name}, ${offer.project_location || null}, ${offer.project_description || null},
+      ${offer.work_items_json}, ${offer.subtotal}, ${offer.vat}, ${offer.total}, ${new Date().toISOString()}
+    )
+    ON CONFLICT (offer_number) DO UPDATE SET
+      offer_date = ${offer.offer_date},
+      valid_until = ${offer.valid_until},
+      customer_name = ${offer.customer_name},
+      customer_company = ${offer.customer_company || null},
+      customer_address = ${offer.customer_address || null},
+      customer_phone = ${offer.customer_phone || null},
+      customer_email = ${offer.customer_email || null},
+      project_name = ${offer.project_name},
+      project_location = ${offer.project_location || null},
+      project_description = ${offer.project_description || null},
+      work_items_json = ${offer.work_items_json},
+      subtotal = ${offer.subtotal},
+      vat = ${offer.vat},
+      total = ${offer.total}
+  `;
 }
