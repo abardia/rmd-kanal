@@ -11,10 +11,6 @@ interface OfferFormProps {
 export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    calculateTotal();
-  }, []);
-
   function calculateTotal() {
     let subtotal = 0;
 
@@ -49,6 +45,11 @@ export default function OfferForm({ defaultPrices, prefill }: OfferFormProps) {
 
     setTotal(subtotal * 1.19);
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    calculateTotal();
+  }, []);
 
   const getValue = (key: string) => {
     if (prefill[key] !== undefined && prefill[key] !== null && prefill[key] !== '') {

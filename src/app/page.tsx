@@ -7,13 +7,13 @@ import ThemeToggle from './ThemeToggle';
 export default async function Home({ searchParams }: { searchParams: Promise<{ prefill?: string }> }) {
   const params = await searchParams;
   let pricesRaw = await getPrices();
-  if (!pricesRaw || (pricesRaw as any[]).length === 0) {
+  if (!pricesRaw || pricesRaw.length === 0) {
     pricesRaw = getDefaultPrices().map(p => ({ ...p, id: 0, name: p.item_key, unit: 'm' }));
   }
-  const prices = pricesRaw as any[];
+  const prices: Array<{ item_key: string; default_price: number }> = pricesRaw as Array<{ item_key: string; default_price: number }>;
   
   const defaultPrices: Record<string, number> = {};
-  for (const p of prices as { item_key: string; default_price: number }[]) {
+  for (const p of prices) {
     defaultPrices[p.item_key] = p.default_price;
   }
 

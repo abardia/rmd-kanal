@@ -26,8 +26,9 @@ export default function LLMPage() {
       const result = await extractWithLLM(text);
       const encoded = Buffer.from(JSON.stringify(result)).toString('base64');
       router.push(`/?prefill=${encoded}`);
-    } catch (err: any) {
-      setError(`Fehler bei der Extraktion: ${err.message || err}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(`Fehler bei der Extraktion: ${message}`);
     } finally {
       setLoading(false);
     }

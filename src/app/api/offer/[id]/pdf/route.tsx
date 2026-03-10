@@ -139,7 +139,7 @@ export async function GET(
 ) {
   const { id } = await params;
   
-  const offer = await getOffer(id) as OfferData | undefined;
+  const offer = await getOffer(id) as unknown as OfferData | undefined;
 
   if (!offer) {
     return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
