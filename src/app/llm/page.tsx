@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { extractWithLLM } from '@/actions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -10,7 +10,90 @@ export default function LLMPage() {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const router = useRouter();
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      setError('Mikrofon konnte nicht gestartet werden. Bitte erlauben Sie den Zugriff.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const transcribeAudio = () => {
+    const win = window as unknown as Record<string, unknown>;
+    const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      setError('Spracherkennung wird von diesem Browser nicht unterstützt. Bitte geben Sie den Text manuell ein.');
+      return;
+    }
+
+    setIsTranscribing(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition = new (SpeechRecognition as any)();
+    recognition.lang = 'de-DE';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setText(prev => prev ? `${prev} ${transcript}` : transcript);
+      setAudioUrl(null);
+      setIsTranscribing(false);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      setError(`Spracherkennung fehlgeschlagen: ${event.error}`);
+      setIsTranscribing(false);
+    };
+
+    if (audioUrl) {
+      fetch(audioUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          const audio = new Audio(audioUrl);
+          audio.play();
+          setTimeout(() => recognition.start(), 500);
+        })
+        .catch(() => {
+          recognition.start();
+        });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +142,7 @@ export default function LLMPage() {
           </div>
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-white!">Text zu Angebot</h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Kopieren Sie E-Mails, Gesprächsnotizen oder Projektbeschreibungen hier hinein.
+            Sprechen Sie oder kopieren Sie E-Mails, Gesprächsnotizen oder Projektbeschreibungen hier hinein.
           </p>
         </div>
 
@@ -84,6 +167,74 @@ export default function LLMPage() {
                 className="min-h-[300px] bg-white/5! border-white/10! text-white! placeholder:text-gray-600! focus:border-blue-500/50! focus:ring-blue-500/10! rounded-2xl text-lg transition-all"
                 disabled={loading}
               />
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
+              {!isRecording ? (
+                <button
+                  type="button"
+                  onClick={startRecording}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors font-medium"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="8" />
+                  </svg>
+                  Aufnehmen
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors font-medium animate-pulse"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                  Stopp
+                </button>
+              )}
+
+              {audioUrl && (
+                <div className="flex items-center gap-3">
+                  <audio controls src={audioUrl} className="h-10 w-64" />
+                  <button
+                    type="button"
+                    onClick={transcribeAudio}
+                    disabled={isTranscribing}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
+                  >
+                    {isTranscribing ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Transkribiere...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Transkribieren
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAudioUrl(null)}
+                    className="text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {isRecording && (
+                <span className="text-red-400 font-medium animate-pulse">Aufnahme läuft...</span>
+              )}
             </div>
 
             <div className="mt-8 flex flex-col gap-4">
