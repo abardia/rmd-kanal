@@ -12,7 +12,10 @@ export async function getPrices() {
     if (rows.length === 0) {
       return getDefaultPrices();
     }
-    return rows;
+    return rows.map((row: Record<string, unknown>) => ({
+      ...row,
+      default_price: Number(row.default_price),
+    }));
   } catch {
     return getDefaultPrices();
   }
@@ -76,7 +79,12 @@ export async function getOffers() {
     const rows = await sql`
       SELECT * FROM offers ORDER BY created_at DESC
     `;
-    return rows;
+    return rows.map((row: Record<string, unknown>) => ({
+      ...row,
+      subtotal: Number(row.subtotal),
+      vat: Number(row.vat),
+      total: Number(row.total),
+    }));
   } catch (err) {
     console.error('getOffers error:', err);
     return [];
