@@ -4,8 +4,8 @@ import ThemeToggle from '../ThemeToggle';
 
 export default async function OffersPage() {
   const offersRaw = await getOffers();
-  const offers = (offersRaw as Array<{
-    id: number; 
+  const offers = (offersRaw as unknown as Array<{
+    id: string; 
     offer_number: string; 
     customer_name: string; 
     customer_company: string | null; 
