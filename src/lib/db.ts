@@ -81,7 +81,7 @@ export async function getOffers() {
   }
 }
 
-export async function getOffer(id: number | string) {
+export async function getOffer(id: number | string): Promise<Record<string, unknown> | null> {
   try {
     if (typeof id === 'string' && id.startsWith('AN-')) {
       const offersRef = collection(db, 'offers');
